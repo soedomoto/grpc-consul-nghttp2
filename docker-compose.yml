@@ -1,0 +1,11 @@
+---
+##
+consul:
+  build: consul
+  ports:
+   - "8301:8300"
+   - "8401:8400"
+   - "8501:8500"
+   - "8601:8600"
+   - "9001:9001"
+  command: /bin/consul agent -server -bootstrap -ui -client 0.0.0.0 -data-dir /opt/consul/data -disable-host-node-id
