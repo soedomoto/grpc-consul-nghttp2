@@ -1,11 +1,31 @@
----
-##
-consul:
-  build: consul
-  ports:
-   - "8301:8300"
-   - "8401:8400"
-   - "8501:8500"
-   - "8601:8600"
-   - "9001:9001"
-  command: /bin/consul agent -server -bootstrap -ui -client 0.0.0.0 -data-dir /opt/consul/data -disable-host-node-id
+version: '2'
+
+services:
+  python:
+    build: python
+    hostname: grpc-server-python
+    command: "python3 /app/greeter_server.py"
+
+  python-2:
+    build: python
+    hostname: grpc-server-python-2
+    command: "python3 /app/greeter_server.py"
+
+  consul:
+    build: consul
+    ports:
+     - "8301:8300"
+     - "8401:8400"
+     - "8501:8500"
+     - "8601:8600"
+     - "9001:9001"
+    command: /bin/consul agent -server -bootstrap -ui -client 0.0.0.0 -data-dir /opt/consul/data -disable-host-node-id
+
+  nghttp2:
+    build: nghttp2
+    ports:
+     - "50051:50051"
+    links:
+     - python:app1
+     - python-2:app2
+    command: /usr/bin/nghttpx --frontend='*,50051;no-tls' --backend=app1,50051;;proto=h2;no-tls --backend=app2,50051;;proto=h2;no-tls
